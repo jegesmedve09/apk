@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APK Search and Download</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #apkTable {
+            width: 100%;
+            border-collapse: collapse;
+            cursor: pointer;
+        }
+        #apkTable th, #apkTable td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        #apkTable th {
+            background-color: #f2f2f2;
+        }
+        input {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>APK Search and Download</h1>
+
+    <label for="nameSearch">Name:</label>
+    <input type="text" id="nameSearch" onkeyup="filterAPKs()">
+    
+    <label for="versionSearch">App Ver:</label>
+    <input type="text" id="versionSearch" onkeyup="filterAPKs()">
+    
+    <label for="androidVersionSearch">Min Android Ver:</label>
+    <input type="text" id="androidVersionSearch" onkeyup="filterAPKs()">
+
+    <table id="apkTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Version</th>
+                <th>Minimum Android Version</th>
+                <th>Target Android Version</th>
+            </tr>
+        </thead>
+        <tbody id="apkList"></tbody>
+    </table>
+    
+    <script>
+        const apks = [
+            { "name": "Tasker", "version": "5.0b9", "min_android_version": "5.0", "target_android_version" : "5.0"  },
+            { "name": "Tasker", "version": "6.3.13", "min_android_version": "5.0", "target_android_version" : "13.0" },
+            { "name": "vu IPTV Player", "version": "1.2.4", "min_android_version": "5.0", "target_android_version" : "" },
+        ];
+        function displayAPKs(data) {
+            const tableBody = document.getElementById('apkList');
+            tableBody.innerHTML = '';
+            data.forEach(apk => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${apk.name}</td>
+                    <td>${apk.version}</td>
+                    <td>${apk.min_android_version}</td>
+                    <td>${apk.target_android_version}</td>
+                `;
+                row.addEventListener('click', () => downloadAPK(apk));
+                tableBody.appendChild(row);
+            });
+        }
+        function filterAPKs() {
+            const nameInput = document.getElementById('nameSearch').value.toLowerCase();
+            const versionInput = document.getElementById('versionSearch').value;
+            const androidVersionInput = document.getElementById('androidVersionSearch').value;
+
+            const filteredAPKs = apks.filter(apk => {
+                const matchesName = apk.name.toLowerCase().includes(nameInput);
+                const matchesVersion = versionInput === '' || apk.version.includes(versionInput);
+                const matchesAndroidVersion = androidVersionInput === '' || parseFloat(apk.min_android_version) <= parseFloat(androidVersionInput);
+                return matchesName && matchesVersion && matchesAndroidVersion;
+            });
+
+            displayAPKs(filteredAPKs);
+        }
+        function downloadAPK(apk) {
+            const apkFileName = `${apk.name}-${apk.version}.apk`;
+            const downloadLink = document.createElement('a');
+            downloadLink.href = `APKs/${apkFileName}`;
+            downloadLink.download = apkFileName;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+        displayAPKs(apks);
+    </script>
+
+</body>
+</html>
